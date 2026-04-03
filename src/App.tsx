@@ -1,25 +1,9 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Sun, Moon, Loader2, AlertCircle, User, Zap, Shield, Heart } from "lucide-react"
+import type { ApiResponse, Character } from "./types/type"
 
-type NatureType = string
 
-type Character = {
-  id: number
-  name: string
-  images: string[]
-  nature_type: NatureType[]
-  personal?: {
-    affiliation?: string | string[]
-  }
-  rank?: {
-    ninjaRank?: Record<string, string>
-  }
-}
-
-type ApiResponse = {
-  characters: Character[]
-}
 
 const App = () => {
   const [theme, setTheme] = useState(false)
@@ -46,7 +30,6 @@ const App = () => {
     fetchCharacters()
   }, [])
 
-  // Gestion du thème via Tailwind (dark mode)
   useEffect(() => {
     if (theme) {
       document.documentElement.classList.add('dark')
@@ -148,7 +131,7 @@ const App = () => {
 
           <motion.div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
             <AnimatePresence mode="popLayout">
-              {filtered.map((character, i) => (
+              {filtered.map((character) => (
                 <motion.div
                   key={character.id}
                   layout
@@ -159,7 +142,7 @@ const App = () => {
                   whileHover={{ y: -5 }}
                   className={`group rounded-2xl overflow-hidden border backdrop-blur-xl transition-all cursor-pointer
                     ${theme
-                      ? 'bg-white/[0.04] border-white/[0.08] shadow-2xl shadow-black'
+                      ? 'bg-white/4 border-white/8 shadow-2xl shadow-black'
                       : 'bg-white border-[#e8e6e1] shadow-md shadow-gray-200'}`}
                 >
                   {/* Image Container */}
@@ -176,7 +159,7 @@ const App = () => {
                         <User size={40} className="opacity-10" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-60" />
                   </div>
 
                   {/* Character Info */}
