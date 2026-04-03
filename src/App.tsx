@@ -22,11 +22,11 @@ type ApiResponse = {
 }
 
 const App = () => {
-  const [theme, setTheme]           = useState(false)
+  const [theme, setTheme] = useState(false)
   const [characters, setCharacters] = useState<Character[]>([])
-  const [loading, setLoading]       = useState(true)
-  const [error, setError]           = useState<string | null>(null)
-  const [search, setSearch]         = useState("")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [search, setSearch] = useState("")
 
   const toggleTheme = () => setTheme(prev => !prev)
 
@@ -46,11 +46,13 @@ const App = () => {
     fetchCharacters()
   }, [])
 
+  // Gestion du thème via Tailwind (dark mode)
   useEffect(() => {
-    document.body.style.transition = "background-color 0.4s ease, color 0.4s ease"
-    document.body.style.backgroundColor = theme ? "#0a0a0f" : "#f7f6f3"
-    document.body.style.color = theme ? "#f0ede8" : "#1a1916"
-    document.body.style.margin = "0"
+    if (theme) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
   }, [theme])
 
   const filtered = characters.filter(c =>
@@ -58,24 +60,22 @@ const App = () => {
   )
 
   return (
-    <div style={{ minHeight: '100vh', padding: '24px', fontFamily: "'DM Mono', monospace" }}>
+    <div className={`min-h-screen transition-colors duration-500 font-mono p-6
+      ${theme ? 'bg-[#0a0a0f] text-[#f0ede8]' : 'bg-[#f7f6f3] text-[#1a1916]'}`}>
+
       {/* Header */}
-      <motion.div
+      <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}
+        className="flex items-center justify-between mb-8"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#e8a838', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Zap size={18} color="#fff" />
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#e8a838] flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <Zap size={18} className="text-white" />
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              Naruto Wiki
-            </h1>
-            <p style={{ margin: 0, fontSize: 10, opacity: 0.4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              Dattebayo API
-            </p>
+            <h1 className="text-xl font-extrabold tracking-tight">Naruto Wiki</h1>
+            <p className="text-[10px] opacity-40 tracking-[0.2em] uppercase">Dattebayo API</p>
           </div>
         </div>
 
@@ -83,110 +83,110 @@ const App = () => {
           whileTap={{ scale: 0.92 }}
           whileHover={{ scale: 1.05 }}
           onClick={toggleTheme}
-          style={{ padding: '8px 16px', borderRadius: 10, border: `1px solid ${theme ? 'rgba(255,255,255,0.1)' : '#e8e6e1'}`, background: theme ? 'rgba(255,255,255,0.05)' : '#fff', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, fontSize: 12 }}
+          className={`px-4 py-2 rounded-xl border flex items-center gap-2 text-xs transition-all
+            ${theme
+              ? 'bg-white/5 border-white/10 hover:bg-white/10'
+              : 'bg-white border-[#e8e6e1] hover:border-orange-300'}`}
         >
-          {theme ? <Sun size={14} /> : <Moon size={14} />}
+          {theme ? <Sun size={14} className="text-orange-400" /> : <Moon size={14} className="text-indigo-400" />}
           {theme ? "Light" : "Dark"}
         </motion.button>
-      </motion.div>
+      </motion.header>
 
-
-      {/* Search */}
+      {/* Search Bar */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        style={{ position: 'relative', marginBottom: 28, maxWidth: 480 }}
+        className="relative mb-7 max-w-lg"
       >
-        <Search size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', opacity: 0.35, pointerEvents: 'none' }} />
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Rechercher un personnage…"
-          style={{ width: '100%', padding: '11px 16px 11px 40px', borderRadius: 12, border: `1px solid ${theme ? 'rgba(255,255,255,0.1)' : '#e8e6e1'}`, background: theme ? 'rgba(255,255,255,0.05)' : '#fff', color: 'inherit', fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', backdropFilter: 'blur(8px)' }}
+          className={`w-full pl-11 pr-4 py-3 rounded-2xl border text-sm outline-none backdrop-blur-md transition-all
+            ${theme
+              ? 'bg-white/5 border-white/10 focus:border-orange-500/50'
+              : 'bg-white border-[#e8e6e1] focus:border-orange-400 shadow-sm'}`}
         />
       </motion.div>
 
-      {/* Loading */}
+      {/* Loading State */}
       {loading && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: 10 }}>
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
           <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
-            <Loader2 size={22} style={{ opacity: 0.4 }} />
+            <Loader2 size={24} className="opacity-40" />
           </motion.div>
-          <span style={{ opacity: 0.4, fontSize: 13 }}>Chargement des ninjas…</span>
+          <span className="text-sm opacity-40 animate-pulse">Chargement des ninjas…</span>
         </div>
       )}
 
-      {/* Error */}
+      {/* Error State */}
       {error && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderRadius: 12, background: 'rgba(249,113,118,0.1)', border: '1px solid rgba(249,113,118,0.25)', color: '#f97176', maxWidth: 480 }}
+          className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 max-w-lg"
         >
-          <AlertCircle size={16} />
-          <span style={{ fontSize: 13 }}>{error}</span>
+          <AlertCircle size={18} />
+          <span className="text-sm">{error}</span>
         </motion.div>
       )}
 
-      {/* Grid */}
+      {/* Grid Results */}
       {!loading && !error && (
         <>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            style={{ fontSize: 11, opacity: 0.35, marginBottom: 16, letterSpacing: '0.08em' }}
+            className="text-[11px] opacity-40 mb-4 tracking-wider"
           >
             {filtered.length} personnage{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
           </motion.p>
 
-          <motion.div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
-            <AnimatePresence>
+          <motion.div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
+            <AnimatePresence mode="popLayout">
               {filtered.map((character, i) => (
                 <motion.div
                   key={character.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.04, duration: 0.3 }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  style={{
-                    borderRadius: 16, overflow: 'hidden',
-                    border: `1px solid ${theme ? 'rgba(255,255,255,0.08)' : '#e8e6e1'}`,
-                    background: theme ? 'rgba(255,255,255,0.04)' : '#fff',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: theme ? '0 4px 24px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.06)',
-                    cursor: 'pointer',
-                  }}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                  whileHover={{ y: -5 }}
+                  className={`group rounded-2xl overflow-hidden border backdrop-blur-xl transition-all cursor-pointer
+                    ${theme
+                      ? 'bg-white/[0.04] border-white/[0.08] shadow-2xl shadow-black'
+                      : 'bg-white border-[#e8e6e1] shadow-md shadow-gray-200'}`}
                 >
-                  {/* Image */}
-                  <div style={{ height: 180, overflow: 'hidden', position: 'relative', background: theme ? 'rgba(255,255,255,0.03)' : '#f7f6f3' }}>
+                  {/* Image Container */}
+                  <div className={`h-48 overflow-hidden relative ${theme ? 'bg-white/5' : 'bg-gray-100'}`}>
                     {character.images?.[0] ? (
                       <img
                         src={character.images[0]}
                         alt={character.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+                        className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                         onError={e => (e.currentTarget.style.display = 'none')}
                       />
                     ) : (
-                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <User size={40} style={{ opacity: 0.15 }} />
+                      <div className="h-full flex items-center justify-center">
+                        <User size={40} className="opacity-10" />
                       </div>
                     )}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)' }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
                   </div>
 
-                  {/* Info */}
-                  <div style={{ padding: '14px 16px' }}>
-                    <h2 style={{ margin: '0 0 6px', fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
-                      {character.name}
-                    </h2>
+                  {/* Character Info */}
+                  <div className="p-4">
+                    <h2 className="text-sm font-bold mb-2 tracking-tight">{character.name}</h2>
 
                     {character.personal?.affiliation && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10 }}>
-                        <Shield size={11} style={{ opacity: 0.4 }} />
-                        <span style={{ fontSize: 10, opacity: 0.45, letterSpacing: '0.05em' }}>
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <Shield size={11} className="opacity-40" />
+                        <span className="text-[10px] opacity-50 truncate">
                           {Array.isArray(character.personal.affiliation)
                             ? character.personal.affiliation[0]
                             : character.personal.affiliation}
@@ -194,26 +194,18 @@ const App = () => {
                       </div>
                     )}
 
-                    {character.nature_type?.length > 0 && (
-                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-                        {character.nature_type.slice(0, 3).map(type => (
-                          <span key={type} style={{
-                            fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase',
-                            padding: '3px 8px', borderRadius: 6,
-                            background: theme ? 'rgba(232,168,56,0.12)' : 'rgba(232,168,56,0.08)',
-                            border: '1px solid rgba(232,168,56,0.25)',
-                            color: '#e8a838',
-                          }}>
-                            {type}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-1.5">
+                      {character.nature_type?.slice(0, 3).map(type => (
+                        <span key={type} className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-[#e8a838]">
+                          {type}
+                        </span>
+                      ))}
+                    </div>
 
                     {character.rank?.ninjaRank && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
-                        <Heart size={10} style={{ color: '#f97176' }} />
-                        <span style={{ fontSize: 10, opacity: 0.4 }}>
+                      <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-white/5">
+                        <Heart size={10} className="text-red-400" />
+                        <span className="text-[10px] opacity-40 italic">
                           {Object.values(character.rank.ninjaRank).slice(-1)[0]}
                         </span>
                       </div>
