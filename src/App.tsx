@@ -59,7 +59,6 @@ const App = () => {
 
   return (
     <div style={{ minHeight: '100vh', padding: '24px', fontFamily: "'DM Mono', monospace" }}>
-
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -90,6 +89,7 @@ const App = () => {
           {theme ? "Light" : "Dark"}
         </motion.button>
       </motion.div>
+
 
       {/* Search */}
       <motion.div
